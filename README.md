@@ -1,7 +1,3 @@
-[![][travis img]][travis] [![][mavenbadge img]][mavenbadge] [![][versioneye img]][versioneye] [![codecov](https://codecov.io/gh/DataSketches/sketches-android/branch/master/graph/badge.svg)](https://codecov.io/gh/DataSketches/sketches-android)
-
-[![][gitter img]][gitter]
-
 =================
 
 # Sketches Android Library
