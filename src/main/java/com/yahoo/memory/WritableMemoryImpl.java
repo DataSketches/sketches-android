@@ -14,7 +14,6 @@ import static com.yahoo.memory.Util.INT_SHIFT;
 import static com.yahoo.memory.Util.LONG_SHIFT;
 import static com.yahoo.memory.Util.SHORT_SHIFT;
 import static com.yahoo.memory.Util.assertBounds;
-import static com.yahoo.memory.Util.checkOverlap;
 import static com.yahoo.memory.Util.LS;
 
 import java.nio.ByteBuffer;
@@ -55,13 +54,6 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   //REGIONS/DUPLICATES XXX
-  /*
-  @Override
-  public Memory duplicate() {
-    return region(0, capacity);
-  }
-  */
-
   @Override
   public WritableMemory writableDuplicate() {
     return writableRegion(0, capacity);
@@ -69,7 +61,8 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public Memory region(final long offsetBytes, final long capacityBytes) {
-    return writableRegion(offset + offsetBytes, capacityBytes);
+    // just a wrapper around writableRegion() to return non-writable Memory
+    return writableRegion(offsetBytes, capacityBytes);
   }
 
   @Override
@@ -87,12 +80,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getBooleanArray(final long offsetBytes, final boolean[] dstArray, final int dstOffset,
-                              final int length) {
-    final long copyBytes = length << BOOLEAN_SHIFT;
+                              final int lengthBooleans) {
+    final long copyBytes = lengthBooleans << BOOLEAN_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthBooleans, dstArray.length);
     int srcIdx = (int) (offset + offsetBytes);
-    for (int i = dstOffset; i < dstOffset + length; ++i, ++srcIdx) {
+    for (int i = dstOffset; i < dstOffset + lengthBooleans; ++i, ++srcIdx) {
       dstArray[i] = byteBuf.get(srcIdx) != 0;
     }
   }
@@ -105,17 +98,17 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getByteArray(final long offsetBytes, final byte[] dstArray, final int dstOffset,
-                           final int length) {
-    final int copyBytes = length << BYTE_SHIFT;
+                           final int lengthBytes) {
+    final int copyBytes = lengthBytes << BYTE_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthBytes, dstArray.length);
     if (byteBuf.hasArray()) {
       final byte[] srcArray = byteBuf.array();
       final int srcOffset = offset + (int) offsetBytes;
       System.arraycopy(srcArray, srcOffset, dstArray, dstOffset, copyBytes);
     } else {
       int srcIdx = (int) (offset + offsetBytes);
-      for (int i = dstOffset; i < dstOffset + length; ++i, ++srcIdx) {
+      for (int i = dstOffset; i < dstOffset + lengthBytes; ++i, ++srcIdx) {
         dstArray[i] = byteBuf.get(srcIdx);
       }
     }
@@ -129,12 +122,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getCharArray(final long offsetBytes, final char[] dstArray, final int dstOffset,
-                           final int length) {
-    final long copyBytes = length << CHAR_SHIFT;
+                           final int lengthChars) {
+    final long copyBytes = lengthChars << CHAR_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthChars, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Character.BYTES) {
+    for (int i = dstOffset; i < dstOffset + lengthChars; ++i, srcIdx += Character.BYTES) {
       dstArray[i] = byteBuf.getChar(srcIdx);
     }
   }
@@ -147,12 +140,13 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getDoubleArray(final long offsetBytes, final double[] dstArray, final int dstOffset,
-                             final int length) {
-    final long copyBytes = length << DOUBLE_SHIFT;
+                             final int lengthDoubles) {
+    final long copyBytes = lengthDoubles << DOUBLE_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthDoubles, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Double.BYTES) {
+
+    for (int i = dstOffset; i < dstOffset + lengthDoubles; ++i, srcIdx += Double.BYTES) {
       dstArray[i] = byteBuf.getDouble(srcIdx);
     }
   }
@@ -165,12 +159,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getFloatArray(final long offsetBytes, final float[] dstArray, final int dstOffset,
-                            final int length) {
-    final long copyBytes = length << FLOAT_SHIFT;
+                            final int lengthFloats) {
+    final long copyBytes = lengthFloats << FLOAT_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthFloats, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Float.BYTES) {
+    for (int i = dstOffset; i < dstOffset + lengthFloats; ++i, srcIdx += Float.BYTES) {
       dstArray[i] = byteBuf.getFloat(srcIdx);
     }
   }
@@ -183,12 +177,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getIntArray(final long offsetBytes, final int[] dstArray, final int dstOffset,
-                          final int length) {
-    final long copyBytes = length << INT_SHIFT;
+                          final int lengthInts) {
+    final long copyBytes = lengthInts << INT_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthInts, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Integer.BYTES) {
+    for (int i = dstOffset; i < dstOffset + lengthInts; ++i, srcIdx += Integer.BYTES) {
       dstArray[i] = byteBuf.getInt(srcIdx);
     }
   }
@@ -201,12 +195,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getLongArray(final long offsetBytes, final long[] dstArray, final int dstOffset,
-                           final int length) {
-    final long copyBytes = length << LONG_SHIFT;
+                           final int lengthLongs) {
+    final long copyBytes = lengthLongs << LONG_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthLongs, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Long.BYTES) {
+    for (int i = dstOffset; i < dstOffset + lengthLongs; ++i, srcIdx += Long.BYTES) {
       dstArray[i] = byteBuf.getLong(srcIdx);
     }
   }
@@ -219,12 +213,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void getShortArray(final long offsetBytes, final short[] dstArray, final int dstOffset,
-                            final int length) {
-    final long copyBytes = length << SHORT_SHIFT;
+                            final int lengthShorts) {
+    final long copyBytes = lengthShorts << SHORT_SHIFT;
     Util.checkBounds(offsetBytes, copyBytes, capacity);
-    Util.checkBounds(dstOffset, length, dstArray.length);
+    Util.checkBounds(dstOffset, lengthShorts, dstArray.length);
     int srcIdx = offset + (int) offsetBytes;
-    for (int i = dstOffset; i < dstOffset + length; ++i, srcIdx += Short.BYTES) {
+    for (int i = dstOffset; i < dstOffset + lengthShorts; ++i, srcIdx += Short.BYTES) {
       dstArray[i] = byteBuf.getShort(srcIdx);
     }
   }
@@ -267,11 +261,17 @@ class WritableMemoryImpl extends WritableMemory {
                      final long dstOffsetBytes, final long lengthBytes) {
     Util.checkBounds(srcOffsetBytes, lengthBytes, capacity);
     Util.checkBounds(dstOffsetBytes, lengthBytes, destination.getCapacity());
-    assert ((this != destination) || checkOverlap(srcOffsetBytes, dstOffsetBytes, lengthBytes)) : "Region Overlap";
+
+    if (isSameResource(destination)) {
+      if (srcOffsetBytes == dstOffsetBytes) {
+        return;
+      }
+    }
 
     final int length = (int) lengthBytes;
     final byte[] srcData = new byte[length];
-    byteBuf.get(srcData, (int) srcOffsetBytes, length);
+    // TODO: there's got to be an efficient way to do this without an intermediate array
+    getByteArray(srcOffsetBytes, srcData, 0, length); // uses System.arraycopy() if possible
     destination.putByteArray(dstOffsetBytes, srcData, 0, length);
   }
 
