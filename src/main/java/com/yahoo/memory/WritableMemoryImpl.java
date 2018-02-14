@@ -34,23 +34,24 @@ class WritableMemoryImpl extends WritableMemory {
   final private ByteBuffer byteBuf; // buffer holding the backing data
 
   static {
-    ZERO_SIZE_MEMORY = new WritableMemoryImpl(
-            ByteBuffer.wrap(new byte[0])
-    );
+    ZERO_SIZE_MEMORY = new WritableMemoryImpl(ByteBuffer.wrap(new byte[0]), ByteOrder.nativeOrder());
   }
 
-  WritableMemoryImpl(final ByteBuffer bb) {
+  WritableMemoryImpl(final ByteBuffer bb, final ByteOrder byteOrder) {
+    assert bb != null;
     this.byteBuf = bb;
     capacity = bb.capacity();
     offset = 0;
-    byteBuf.order(ByteOrder.nativeOrder());
+    byteBuf.order(byteOrder);
   }
 
-  private WritableMemoryImpl(final ByteBuffer bb, final int offsetBytes, final int capacityBytes) {
+  private WritableMemoryImpl(final ByteBuffer bb, final int offsetBytes, final int capacityBytes,
+                             final ByteOrder byteOrder) {
+    assert bb != null;
     this.byteBuf = bb;
     capacity = capacityBytes;
     offset = offsetBytes;
-    byteBuf.order(ByteOrder.nativeOrder());
+    byteBuf.order(byteOrder);
   }
 
   //REGIONS/DUPLICATES XXX
@@ -68,7 +69,7 @@ class WritableMemoryImpl extends WritableMemory {
   @Override
   public WritableMemory writableRegion(final long offsetBytes, final long capacityBytes) {
     Util.checkBounds(offsetBytes, capacityBytes, capacity);
-    return new WritableMemoryImpl(byteBuf, offset + (int) offsetBytes, (int) capacityBytes);
+    return new WritableMemoryImpl(byteBuf, offset + (int) offsetBytes, (int) capacityBytes, byteBuf.order());
   }
 
   ///PRIMITIVE getXXX() and getXXXArray() XXX
@@ -303,7 +304,7 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public boolean hasByteBuffer() {
-    return byteBuf != null;
+    return true;
   }
 
   @Override
@@ -333,11 +334,6 @@ class WritableMemoryImpl extends WritableMemory {
     }
 
     return false;
-  }
-
-  @Override
-  public boolean isValid() {
-    return true;
   }
 
   @Override
@@ -581,8 +577,10 @@ class WritableMemoryImpl extends WritableMemory {
   public void fill(final long offsetBytes, final long lengthBytes, final byte value) {
     Util.checkBounds((int) offsetBytes, (int) lengthBytes, capacity);
     int tgtIdx = offset + (int) offsetBytes;
-    for (int i = 0; i < lengthBytes; ++i, ++tgtIdx) {
+    final int endIdx = tgtIdx + (int) lengthBytes;
+    while (tgtIdx < endIdx) {
       byteBuf.put(tgtIdx, value);
+      ++tgtIdx;
     }
   }
 

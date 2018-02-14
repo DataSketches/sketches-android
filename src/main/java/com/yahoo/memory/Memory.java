@@ -23,7 +23,7 @@ import java.nio.ByteOrder;
 public abstract class Memory {
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for read-only operations.
+   * Accesses the given ByteBuffer for read-only operations, with native byte order.
    * @param byteBuf the given ByteBuffer, must not be null
    * @return the given ByteBuffer for read-only operations.
    */
@@ -31,7 +31,7 @@ public abstract class Memory {
     if ((byteBuf != null) && (byteBuf.capacity() == 0)) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
-    return new WritableMemoryImpl(byteBuf);
+    return new WritableMemoryImpl(byteBuf, ByteOrder.nativeOrder());
   }
 
   //REGIONS XXX
@@ -83,8 +83,7 @@ public abstract class Memory {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     final ByteBuffer bb = ByteBuffer.wrap(arr);
-    bb.order(byteOrder);
-    return new WritableMemoryImpl(bb);
+    return new WritableMemoryImpl(bb, byteOrder);
   }
 
   //PRIMITIVE getXXX() and getXXXArray() XXX
@@ -306,12 +305,6 @@ public abstract class Memory {
    * of <i>that</i>.
    */
   public abstract boolean isSameResource(Memory that);
-
-  /**
-   * Returns true if this Memory is valid() and has not been closed.
-   * @return true if this Memory is valid() and has not been closed.
-   */
-  public abstract boolean isValid();
 
   /**
    * Return true if bytes need to be swapped based on resource ByteOrder.

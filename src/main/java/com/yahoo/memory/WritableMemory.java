@@ -8,6 +8,7 @@ package com.yahoo.memory;
 import static com.yahoo.memory.Util.nullCheck;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  * Provides read and write primitive and primitive array access to any of the four resources
@@ -20,7 +21,7 @@ import java.nio.ByteBuffer;
 public abstract class WritableMemory extends Memory {
   //BYTE BUFFER XXX
   /**
-   * Accesses the given ByteBuffer for write operations.
+   * Accesses the given ByteBuffer for write operations, with native byte order.
    * @param byteBuf the given ByteBuffer
    * @return the given ByteBuffer for write operations.
    */
@@ -31,7 +32,7 @@ public abstract class WritableMemory extends Memory {
     if (byteBuf.capacity() == 0) {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
-    return new WritableMemoryImpl(byteBuf);
+    return new WritableMemoryImpl(byteBuf, ByteOrder.nativeOrder());
   }
 
   //REGIONS/DUPLICATES XXX
@@ -61,7 +62,7 @@ public abstract class WritableMemory extends Memory {
     }
     final byte[] arr = new byte[capacityBytes];
     final ByteBuffer bb = ByteBuffer.wrap(arr);
-    return new WritableMemoryImpl(bb);
+    return new WritableMemoryImpl(bb, ByteOrder.nativeOrder());
   }
 
   //ACCESS PRIMITIVE HEAP ARRAYS for write XXX
@@ -76,7 +77,21 @@ public abstract class WritableMemory extends Memory {
       return WritableMemoryImpl.ZERO_SIZE_MEMORY;
     }
     final ByteBuffer bb = ByteBuffer.wrap(arr);
-    return new WritableMemoryImpl(bb);
+    return new WritableMemoryImpl(bb, ByteOrder.nativeOrder());
+  }
+
+  /**
+   * Wraps the given primitive array for write operations, using the given byte order
+   * @param arr the given primitive array
+   * @return WritableMemory for write operations
+   */
+  public static WritableMemory wrap(final byte[] arr, final ByteOrder byteOrder) {
+    nullCheck(arr);
+    if (arr.length == 0) {
+      return WritableMemoryImpl.ZERO_SIZE_MEMORY;
+    }
+    final ByteBuffer bb = ByteBuffer.wrap(arr);
+    return new WritableMemoryImpl(bb, byteOrder);
   }
 
   //PRIMITIVE putXXX() and putXXXArray() XXX

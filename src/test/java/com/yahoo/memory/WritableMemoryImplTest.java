@@ -674,6 +674,90 @@ public class WritableMemoryImplTest {
     WritableMemory wmem2 = WritableMemory.wrap(byteArr);
     assertTrue(wmem1.isSameResource(wmem2));
     assertTrue(wmem1.isSameResource(wmem1.writableDuplicate()));
+
+    // Note: some cases covered by testing copyTo()
+    ByteBuffer bb = ByteBuffer.allocate(64);
+    Memory mem = Memory.wrap(bb.asReadOnlyBuffer());
+    assertFalse(mem.isSameResource(wmem1));
+  }
+
+  @Test
+  public void checkGetByType() {
+    final byte[] byteArr = {1, 2, 3, 4, 5, 6, 7, 8};
+    Memory mem = Memory.wrap(byteArr, ByteOrder.LITTLE_ENDIAN);
+
+    assertEquals(mem.getLong(0), 578437695752307201L);
+    assertEquals(mem.getInt(0), 67305985);
+    assertEquals(mem.getInt(4), 134678021);
+    assertEquals(mem.getShort(0), 513);
+    assertEquals(mem.getShort(2), 1027);
+    assertEquals(mem.getShort(4), 1541);
+    assertEquals(mem.getShort(6), 2055);
+    assertEquals(mem.getBoolean(0), true);
+
+    // cast to byte when value would be sign-extended
+    final byte[] piFloatArr = {(byte) 0xDB, 0x0F, 0x49, 0x40};
+    mem = Memory.wrap(piFloatArr, ByteOrder.LITTLE_ENDIAN);
+    assertEquals(mem.getFloat(0), (float) Math.PI, 1e-6);
+
+    final byte[] eDoubleArr = {0x69, 0x57, 0x14, (byte) 0x8B, 0x0A, (byte) 0xBF, 0x05, 0x40};
+    mem = Memory.wrap(eDoubleArr, ByteOrder.LITTLE_ENDIAN);
+    assertEquals(mem.getDouble(0), Math.E, 1e-15);
+  }
+
+  @Test
+  public void checkPutByType() {
+    WritableMemory wmem = WritableMemory.wrap(new byte[8]);
+
+    wmem.putBoolean(0, false);
+    assertEquals(wmem.getByte(0), 0);
+    wmem.clear();
+
+    wmem.putChar(3, (char) 0x5AFB);
+    assertEquals(wmem.getByte(3), (byte) 0xFB);
+    assertEquals(wmem.getByte(4), (byte) 0x5A);
+    wmem.clear(3, Character.BYTES);
+    assertEquals(wmem.getLong(0), 0);
+
+    wmem.putShort(6, (short) 0xEA94);
+    assertEquals(wmem.getByte(6), (byte) 0x94);
+    assertEquals(wmem.getByte(7), (byte) 0xEA);
+    wmem.clear();
+
+    wmem.putInt(0, 0x5221BAA4);
+    assertEquals(wmem.getByte(0), (byte) 0xA4);
+    assertEquals(wmem.getByte(1), (byte) 0xBA);
+    assertEquals(wmem.getByte(2), (byte) 0x21);
+    assertEquals(wmem.getByte(3), (byte) 0x52);
+    wmem.clear();
+
+    wmem.putLong(0, 0x571AB5AB1BB59C72L);
+    assertEquals(wmem.getByte(0), (byte) 0x72);
+    assertEquals(wmem.getByte(1), (byte) 0x9C);
+    assertEquals(wmem.getByte(2), (byte) 0xB5);
+    assertEquals(wmem.getByte(3), (byte) 0x1B);
+    assertEquals(wmem.getByte(4), (byte) 0xAB);
+    assertEquals(wmem.getByte(5), (byte) 0xB5);
+    assertEquals(wmem.getByte(6), (byte) 0x1A);
+    assertEquals(wmem.getByte(7), (byte) 0x57);
+    wmem.clear();
+
+    wmem.putFloat(4, (float) Math.PI);
+    // ignore low-order byte in case LSB differs
+    assertEquals(wmem.getByte(5), (byte) 0x0F);
+    assertEquals(wmem.getByte(6), (byte) 0x49);
+    assertEquals(wmem.getByte(7), (byte) 0x40);
+    wmem.clear();
+
+    wmem.putDouble(0, Math.E);
+    // ignore low-order byte in case LSB differs
+    assertEquals(wmem.getByte(1), (byte) 0x57);
+    assertEquals(wmem.getByte(2), (byte) 0x14);
+    assertEquals(wmem.getByte(3), (byte) 0x8B);
+    assertEquals(wmem.getByte(4), (byte) 0x0A);
+    assertEquals(wmem.getByte(5), (byte) 0xBF);
+    assertEquals(wmem.getByte(6), (byte) 0x05);
+    assertEquals(wmem.getByte(7), (byte) 0x40);
   }
 
   @Test
