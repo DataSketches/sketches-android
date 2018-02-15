@@ -39,7 +39,7 @@ public final class ItemsUnion<T> {
    * @param comparator to compare items
    * @return an instance of ItemsUnion
    */
-  public static <T> ItemsUnion<T> getInstance(final Comparator<? super T> comparator) {
+  public static <T> ItemsUnion<T> newInstance(final Comparator<? super T> comparator) {
     return new ItemsUnion<T>(PreambleUtil.DEFAULT_K, comparator, null);
   }
 
@@ -53,7 +53,7 @@ public final class ItemsUnion<T> {
    * @param comparator to compare items
    * @return an instance of ItemsUnion
    */
-  public static <T> ItemsUnion<T> getInstance(final int maxK, final Comparator<? super T> comparator) {
+  public static <T> ItemsUnion<T> newInstance(final int maxK, final Comparator<? super T> comparator) {
     return new ItemsUnion<>(maxK, comparator, null);
   }
 
@@ -66,9 +66,9 @@ public final class ItemsUnion<T> {
    * @param serDe an instance of ArrayOfItemsSerDe
    * @return an instance of ItemsUnion
    */
-  public static <T> ItemsUnion<T> getInstance(final Memory srcMem,
+  public static <T> ItemsUnion<T> heapify(final Memory srcMem,
       final Comparator<? super T> comparator, final ArrayOfItemsSerDe<T> serDe) {
-    final ItemsSketch<T> gadget = ItemsSketch.getInstance(srcMem, comparator, serDe);
+    final ItemsSketch<T> gadget = ItemsSketch.heapify(srcMem, comparator, serDe);
     return new ItemsUnion<>(gadget.getK(), gadget.getComparator(), gadget);
   }
 
@@ -78,7 +78,7 @@ public final class ItemsUnion<T> {
    * @param sketch the basis of the union
    * @return an instance of ItemsUnion
    */
-  public static <T> ItemsUnion<T> getInstance(final ItemsSketch<T> sketch) {
+  public static <T> ItemsUnion<T> newInstance(final ItemsSketch<T> sketch) {
     return new ItemsUnion<>(sketch.getK(), sketch.getComparator(), ItemsSketch.copy(sketch));
   }
 
@@ -113,7 +113,7 @@ public final class ItemsUnion<T> {
    * @param serDe an instance of ArrayOfItemsSerDe
    */
   public void update(final Memory srcMem, final ArrayOfItemsSerDe<T> serDe) {
-    final ItemsSketch<T> that = ItemsSketch.getInstance(srcMem, comparator_, serDe);
+    final ItemsSketch<T> that = ItemsSketch.heapify(srcMem, comparator_, serDe);
     gadget_ = updateLogic(maxK_, comparator_, gadget_, that);
   }
 
@@ -125,7 +125,7 @@ public final class ItemsUnion<T> {
   public void update(final T dataItem) {
     if (dataItem == null) { return; }
     if (gadget_ == null) {
-      gadget_ = ItemsSketch.getInstance(maxK_, comparator_);
+      gadget_ = ItemsSketch.newInstance(maxK_, comparator_);
     }
     gadget_.update(dataItem);
   }
@@ -137,7 +137,7 @@ public final class ItemsUnion<T> {
    */
   public ItemsSketch<T> getResult() {
     if (gadget_ == null) {
-      return ItemsSketch.getInstance(maxK_, comparator_);
+      return ItemsSketch.newInstance(maxK_, comparator_);
     }
     return ItemsSketch.copy(gadget_); //can't have any externally owned handles.
   }
@@ -216,7 +216,7 @@ public final class ItemsUnion<T> {
     sb.append(Util.LS).append("### Quantiles ").append(thisSimpleName).append(LS);
     sb.append("   maxK                         : ").append(kStr);
     if (gadget_ == null) {
-      sb.append(ItemsSketch.getInstance(maxK_, comparator_).toString());
+      sb.append(ItemsSketch.newInstance(maxK_, comparator_).toString());
       return sb.toString();
     }
     sb.append(gadget_.toString(sketchSummary, dataDetail));
@@ -225,7 +225,7 @@ public final class ItemsUnion<T> {
 
   /**
    * Serialize this union to a byte array. Result is an ItemsSketch, serialized in an
-   * unordered, non-compact form. The resulting byte[] can be passed to getInstance for either a
+   * unordered, non-compact form. The resulting byte[] can be passed to newInstance for either a
    * sketch or union.
    *
    * @param serDe an instance of ArrayOfItemsSerDe
@@ -233,7 +233,7 @@ public final class ItemsUnion<T> {
    */
   public byte[] toByteArray(final ArrayOfItemsSerDe<T> serDe) {
     if (gadget_ == null) {
-      final ItemsSketch<T> sketch = ItemsSketch.getInstance(maxK_, comparator_);
+      final ItemsSketch<T> sketch = ItemsSketch.newInstance(maxK_, comparator_);
       return sketch.toByteArray(serDe);
     } else {
       return gadget_.toByteArray(serDe);
@@ -266,7 +266,7 @@ public final class ItemsUnion<T> {
       case 2: { //myQS = null,  other = valid; stream or downsample to myMaxK
         assert other != null;
         if (!other.isEstimationMode()) { //other is exact, stream items in
-          ret = ItemsSketch.getInstance(myMaxK, comparator);
+          ret = ItemsSketch.newInstance(myMaxK, comparator);
           final int otherCnt = other.getBaseBufferCount();
           final Object[] combBuf = other.getCombinedBuffer();
           for (int i = 0; i < otherCnt; i++) {
@@ -306,7 +306,7 @@ public final class ItemsUnion<T> {
       }
       case 4: {
         assert other != null;
-        ret = ItemsSketch.getInstance(Math.min(myMaxK, other.getK()), comparator);
+        ret = ItemsSketch.newInstance(Math.min(myMaxK, other.getK()), comparator);
         break;
       }
       //default: //This cannot happen and cannot be tested

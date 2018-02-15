@@ -20,7 +20,7 @@ public class SerDeCompatibilityTest {
 
   @Test
   public void itemsToDoubles() {
-    final ItemsSketch<Double> sketch1 = ItemsSketch.getInstance(Comparator.naturalOrder());
+    final ItemsSketch<Double> sketch1 = ItemsSketch.newInstance(Comparator.naturalOrder());
     for (int i = 1; i <= 500; i++) { sketch1.update((double) i); }
 
     final byte[] bytes = sketch1.toByteArray(serDe);
@@ -38,7 +38,7 @@ public class SerDeCompatibilityTest {
 
   @Test
   public void doublesToItems() {
-    final ItemsSketch<Double> sketch1 = ItemsSketch.getInstance(Comparator.naturalOrder()); //SerVer = 3
+    final ItemsSketch<Double> sketch1 = ItemsSketch.newInstance(Comparator.naturalOrder()); //SerVer = 3
     for (int i = 1; i <= 500; i++) { sketch1.update((double) i); }
 
     final byte[] bytes = sketch1.toByteArray(true, new ArrayOfDoublesSerDe()); // must be compact

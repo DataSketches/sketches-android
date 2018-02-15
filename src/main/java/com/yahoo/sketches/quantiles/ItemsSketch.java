@@ -123,8 +123,8 @@ public final class ItemsSketch<T> {
    * @param comparator to compare items
    * @return a GenericQuantileSketch
    */
-  public static <T> ItemsSketch<T> getInstance(final Comparator<? super T> comparator) {
-    return getInstance(PreambleUtil.DEFAULT_K, comparator);
+  public static <T> ItemsSketch<T> newInstance(final Comparator<? super T> comparator) {
+    return newInstance(PreambleUtil.DEFAULT_K, comparator);
   }
 
   /**
@@ -135,7 +135,7 @@ public final class ItemsSketch<T> {
    * @param comparator to compare items
    * @return a GenericQuantileSketch
    */
-  public static <T> ItemsSketch<T> getInstance(final int k, final Comparator<? super T> comparator) {
+  public static <T> ItemsSketch<T> newInstance(final int k, final Comparator<? super T> comparator) {
     final ItemsSketch<T> qs = new ItemsSketch<>(k, comparator);
     final int bufAlloc = 2 * Math.min(MIN_K, k); //the min is important
     qs.n_ = 0;
@@ -173,14 +173,16 @@ public final class ItemsSketch<T> {
 
     ItemsUtil.checkItemsSerVer(serVer);
 
-    if ((serVer == 3) && ((flags & COMPACT_FLAG_MASK) == 0)) {
+    if (serVer != SER_VER) {
+      throw new SketchesArgumentException("Possible corruption: Invalid serialization version: " + serVer);
+    } else if ((flags & COMPACT_FLAG_MASK) == 0) {
       throw new SketchesArgumentException("Non-compact Memory images are not supported.");
     }
 
     final boolean empty = Util.checkPreLongsFlagsCap(preambleLongs, flags, memCapBytes);
     Util.checkFamilyID(familyID);
 
-    final ItemsSketch<T> qs = getInstance(k, comparator); //checks k
+    final ItemsSketch<T> qs = newInstance(k, comparator); //checks k
     if (empty) { return qs; }
 
     //Not empty, must have valid preamble + min, max
@@ -211,7 +213,7 @@ public final class ItemsSketch<T> {
    * @return a copy of the given sketch
    */
   static <T> ItemsSketch<T> copy(final ItemsSketch<T> sketch) {
-    final ItemsSketch<T> qsCopy = ItemsSketch.getInstance(sketch.k_, sketch.comparator_);
+    final ItemsSketch<T> qsCopy = ItemsSketch.newInstance(sketch.k_, sketch.comparator_);
     qsCopy.n_ = sketch.n_;
     qsCopy.minValue_ = sketch.getMinValue();
     qsCopy.maxValue_ = sketch.getMaxValue();
@@ -515,7 +517,7 @@ public final class ItemsSketch<T> {
    * @return the new sketch.
    */
   public ItemsSketch<T> downSample(final int newK) {
-    final ItemsSketch<T> newSketch = ItemsSketch.getInstance(newK, comparator_);
+    final ItemsSketch<T> newSketch = ItemsSketch.newInstance(newK, comparator_);
     ItemsMergeImpl.downSamplingMergeInto(this, newSketch);
     return newSketch;
   }

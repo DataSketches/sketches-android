@@ -5,7 +5,6 @@
 package com.yahoo.sketches;
 
 import static com.yahoo.sketches.Family.idToFamily;
-import static com.yahoo.sketches.Family.objectToFamily;
 import static com.yahoo.sketches.Family.stringToFamily;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -50,28 +49,10 @@ public class FamilyTest {
     String fName = stringToFamily(inStr).toString();
     assertEquals(fName, inStr.toUpperCase());
   }
-  
-  @Test
-  public void checkFamily() {
-    ItemsSketch<Double> sk = ItemsSketch.getInstance(10, Comparator.naturalOrder());
-    String sname = sk.getClass().getSimpleName();
-    String fname = Family.objectToFamily(sk).toString();
-    assertTrue(sname.toUpperCase().contains(fname));
-    
-//    for (Family f : Family.values()) {
-//      String fstr = f.toString();
-//      println("Name: "+fstr + ": ID: "+f.getID());
-//    }
-  }
-  
+
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void checkBadFamilyName() {
     stringToFamily("Test");
-  }
-  
-  @Test(expectedExceptions = SketchesArgumentException.class)
-  public void checkBadObject() {
-    objectToFamily("Test");
   }
   
   @Test(expectedExceptions = SketchesArgumentException.class)

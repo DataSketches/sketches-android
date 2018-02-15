@@ -30,7 +30,7 @@ public class ItemsSketchTest {
 
   @Test
   public void empty() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(128, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(128, Comparator.naturalOrder());
     Assert.assertNotNull(sketch);
     Assert.assertTrue(sketch.isEmpty());
     Assert.assertEquals(sketch.getN(), 0);
@@ -49,7 +49,7 @@ public class ItemsSketchTest {
 
   @Test
   public void oneItem() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(128, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(128, Comparator.naturalOrder());
     sketch.update("a");
     Assert.assertEquals(sketch.getN(), 1);
     Assert.assertEquals(sketch.getRetainedItems(), 1);
@@ -95,7 +95,7 @@ public class ItemsSketchTest {
 
   @Test
   public void estimation() {
-    ItemsSketch<Integer> sketch = ItemsSketch.getInstance(128, Comparator.naturalOrder());
+    ItemsSketch<Integer> sketch = ItemsSketch.newInstance(128, Comparator.naturalOrder());
     for (int i = 1; i <= 1000; i++) {
       sketch.update(i);
     }
@@ -172,14 +172,14 @@ public class ItemsSketchTest {
 
   @Test
   public void serializeDeserializeLong() {
-    ItemsSketch<Long> sketch1 = ItemsSketch.getInstance(128, Comparator.naturalOrder());
+    ItemsSketch<Long> sketch1 = ItemsSketch.newInstance(128, Comparator.naturalOrder());
     for (int i = 1; i <= 500; i++) {
       sketch1.update((long) i);
     }
 
     ArrayOfItemsSerDe<Long> serDe = new ArrayOfLongsSerDe();
     byte[] bytes = sketch1.toByteArray(serDe);
-    ItemsSketch<Long> sketch2 = ItemsSketch.getInstance(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
+    ItemsSketch<Long> sketch2 = ItemsSketch.heapify(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
 
     for (int i = 501; i <= 1000; i++) {
       sketch2.update((long) i);
@@ -194,14 +194,14 @@ public class ItemsSketchTest {
 
   @Test
   public void serializeDeserializeDouble() {
-    ItemsSketch<Double> sketch1 = ItemsSketch.getInstance(128, Comparator.naturalOrder());
+    ItemsSketch<Double> sketch1 = ItemsSketch.newInstance(128, Comparator.naturalOrder());
     for (int i = 1; i <= 500; i++) {
       sketch1.update((double) i);
     }
 
     ArrayOfItemsSerDe<Double> serDe = new ArrayOfDoublesSerDe();
     byte[] bytes = sketch1.toByteArray(serDe);
-    ItemsSketch<Double> sketch2 = ItemsSketch.getInstance(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
+    ItemsSketch<Double> sketch2 = ItemsSketch.heapify(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
 
     for (int i = 501; i <= 1000; i++) {
       sketch2.update((double) i);
@@ -225,7 +225,7 @@ public class ItemsSketchTest {
         return i1.compareTo(i2);
       }
     };
-    ItemsSketch<String> sketch1 = ItemsSketch.getInstance(128, numericOrder);
+    ItemsSketch<String> sketch1 = ItemsSketch.newInstance(128, numericOrder);
     for (int i = 1; i <= 500; i++)
      {
       sketch1.update(Integer.toBinaryString(i << 10)); // to make strings longer
@@ -233,7 +233,7 @@ public class ItemsSketchTest {
 
     ArrayOfItemsSerDe<String> serDe = new ArrayOfStringsSerDe();
     byte[] bytes = sketch1.toByteArray(serDe);
-    ItemsSketch<String> sketch2 = ItemsSketch.getInstance(Memory.wrap(bytes), numericOrder, serDe);
+    ItemsSketch<String> sketch2 = ItemsSketch.heapify(Memory.wrap(bytes), numericOrder, serDe);
 
     for (int i = 501; i <= 1000; i++) {
       sketch2.update(Integer.toBinaryString(i << 10));
@@ -248,7 +248,7 @@ public class ItemsSketchTest {
 
   @Test
   public void toStringCrudeCheck() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     String brief, full, part;
     brief = sketch.toString();
     full = sketch.toString(true, true);
@@ -264,12 +264,12 @@ public class ItemsSketchTest {
     byte[] bytes = sketch.toByteArray(serDe);
     PreambleUtil.toString(bytes, false);
     //PreambleUtil.toString(bytes, true); // not a DoublesSketch so this will fail
-    //ItemsSketch<String> sketch2 = ItemsSketch.getInstance(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
+    //ItemsSketch<String> sketch2 = ItemsSketch.newInstance(Memory.wrap(bytes), Comparator.naturalOrder(), serDe);
   }
 
   @Test
   public void toStringBiggerCheck() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     for (int i=0; i<40; i++) {
       sketch.update(Integer.toString(i));
     }
@@ -281,7 +281,7 @@ public class ItemsSketchTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void checkDownsampleException() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     for (int i=0; i<40; i++) {
       sketch.update(Integer.toString(i));
     }
@@ -290,14 +290,14 @@ public class ItemsSketchTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void zeroEvenlySpacedMustThrow() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     sketch.update("a");
     sketch.getQuantiles(0);
   }
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void negativeQuantileMustThrow() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     sketch.update(null);
     sketch.getQuantile(-0.1);
   }
@@ -305,27 +305,27 @@ public class ItemsSketchTest {
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void checkGetInstanceExcep1() {
     Memory mem = Memory.wrap(new byte[4]);
-    ItemsSketch.getInstance(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
+    ItemsSketch.heapify(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
   }
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void checkGetInstanceExcep2() {
     Memory mem = Memory.wrap(new byte[8]);
-    ItemsSketch.getInstance(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
+    ItemsSketch.heapify(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
   }
 
   @Test
   public void checkGoodSerDeId() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     byte[] byteArr = sketch.toByteArray(new ArrayOfStringsSerDe());
     Memory mem = Memory.wrap(byteArr);
     //println(PreambleUtil.toString(mem));
-    ItemsSketch.getInstance(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
+    ItemsSketch.heapify(mem, Comparator.naturalOrder(), new ArrayOfStringsSerDe());
   }
 
   @Test
   public void checkDownsample() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     for (int i=0; i<40; i++) {
       sketch.update(Integer.toString(i));
     }
@@ -335,21 +335,21 @@ public class ItemsSketchTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void unorderedSplitPoints() {
-    ItemsSketch<Integer> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Integer> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     sketch.update(1);
     sketch.getPMF(new Integer[] {2, 1});
   }
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void nonUniqueSplitPoints() {
-    ItemsSketch<Integer> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Integer> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     sketch.update(1);
     sketch.getPMF(new Integer[] {1, 1});
   }
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void nullInSplitPoints() {
-    ItemsSketch<Integer> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Integer> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     sketch.update(1);
     sketch.getPMF(new Integer[] {1, null});
   }
@@ -357,17 +357,17 @@ public class ItemsSketchTest {
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void compactNotSupported() {
     ArrayOfDoublesSerDe serDe = new ArrayOfDoublesSerDe();
-    ItemsSketch<Double> sketch = ItemsSketch.getInstance(Comparator.naturalOrder());
+    ItemsSketch<Double> sketch = ItemsSketch.newInstance(Comparator.naturalOrder());
     byte[] byteArr = sketch.toByteArray(serDe);
     WritableMemory mem = WritableMemory.wrap(byteArr);
     mem.clearBits(PreambleUtil.FLAGS_BYTE, (byte) PreambleUtil.COMPACT_FLAG_MASK);
     println(PreambleUtil.toString(mem, false));
-    ItemsSketch.getInstance(mem, Comparator.naturalOrder(), serDe);
+    ItemsSketch.heapify(mem, Comparator.naturalOrder(), serDe);
   }
 
   @Test
   public void checkPutMemory() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     for (int i=0; i<40; i++) {
       sketch.update(Integer.toString(i));
     }
@@ -378,7 +378,7 @@ public class ItemsSketchTest {
 
   @Test(expectedExceptions = SketchesArgumentException.class)
   public void checkPutMemoryException() {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(16, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(16, Comparator.naturalOrder());
     for (int i=0; i<40; i++) {
       sketch.update(Integer.toString(i));
     }
@@ -417,7 +417,7 @@ public class ItemsSketchTest {
     //ordered
     byteArr = is.toByteArray(true, serDe);
     mem = Memory.wrap(byteArr);
-    is2 = ItemsSketch.getInstance(mem, Comparator.naturalOrder(), serDe);
+    is2 = ItemsSketch.heapify(mem, Comparator.naturalOrder(), serDe);
     for (double f = 0.1; f < 0.95; f += 0.1) {
       assertEquals(is.getQuantile(f), is2.getQuantile(f));
     }
@@ -425,7 +425,7 @@ public class ItemsSketchTest {
     //Not-ordered
     byteArr = is.toByteArray(false, serDe);
     mem = Memory.wrap(byteArr);
-    is2 = ItemsSketch.getInstance(mem, Comparator.naturalOrder(), serDe);
+    is2 = ItemsSketch.heapify(mem, Comparator.naturalOrder(), serDe);
     for (double f = 0.1; f < 0.95; f += 0.1) {
       assertEquals(is.getQuantile(f), is2.getQuantile(f));
     }
@@ -436,7 +436,7 @@ public class ItemsSketchTest {
   }
 
   static ItemsSketch<String> buildStringIS(int k, int n, int start) {
-    ItemsSketch<String> sketch = ItemsSketch.getInstance(k, Comparator.naturalOrder());
+    ItemsSketch<String> sketch = ItemsSketch.newInstance(k, Comparator.naturalOrder());
     for (int i = 0; i < n; i++) {
       sketch.update(Integer.toString(i + start));
     }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.Comparator;
 
 import com.yahoo.sketches.ArrayOfDoublesSerDe;
+import com.yahoo.sketches.SketchesArgumentException;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -18,40 +19,20 @@ import com.yahoo.memory.Memory;
 
 public class ForwardCompatibilityTest {
 
-  @Test
+  @Test(expectedExceptions = SketchesArgumentException.class)
   //fullPath: sketches/src/test/resources/Qk128_n50_v0.3.0.bin
   //Median2: 26.0
-  public void check030_50() {
+  public void checkInvalid030_50() {
     int n = 50;
     String ver = "0.3.0";
     double expected = 26;
     getAndCheck(ver, n, expected);
   }
 
-  @Test
-  //fullPath: sketches/src/test/resources/Qk128_n1000_v0.3.0.bin
-  //Median2: 501.0
-  public void check030_1000() {
-    int n = 1000;
-    String ver = "0.3.0";
-    double expected = 501;
-    getAndCheck(ver, n, expected);
-  }
-
-  @Test
-  //fullPath: sketches/src/test/resources/Qk128_n50_v0.6.0.bin
-  //Median2: 26.0
-  public void check060_50() {
-    int n = 50;
-    String ver = "0.6.0";
-    double expected = 26;
-    getAndCheck(ver, n, expected);
-  }
-
-  @Test
+  @Test(expectedExceptions = SketchesArgumentException.class)
   //fullPath: sketches/src/test/resources/Qk128_n1000_v0.6.0.bin
   //Median2: 501.0
-  public void check060_1000() {
+  public void checkInvalid060_1000() {
     int n = 1000;
     String ver = "0.6.0";
     double expected = 501;

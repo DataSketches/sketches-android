@@ -8,13 +8,12 @@ package com.yahoo.sketches;
 import java.nio.charset.StandardCharsets;
 
 import com.yahoo.memory.Memory;
-import com.yahoo.memory.UnsafeUtil;
 import com.yahoo.memory.WritableMemory;
 
 /**
  * Methods of serializing and deserializing arrays of String.
  * This class serializes strings in UTF-8 format, which is more compact compared to
- * {@link ArrayOfUtf16StringsSerDe}. In an extreme case when all strings are in ASCII,
+ * UTF-16. In an extreme case when all strings are in ASCII,
  * this method is 2 times more compact, but it takes more time to encode and decode
  * by a factor of 1.5 to 2.
  *
@@ -47,11 +46,11 @@ public class ArrayOfStringsSerDe extends ArrayOfItemsSerDe<String> {
     final String[] array = new String[numItems];
     long offsetBytes = 0;
     for (int i = 0; i < numItems; i++) {
-      UnsafeUtil.checkBounds(offsetBytes, Integer.BYTES, mem.getCapacity());
+      mem.checkBounds(offsetBytes, Integer.BYTES);
       final int strLength = mem.getInt(offsetBytes);
       offsetBytes += Integer.BYTES;
       final byte[] bytes = new byte[strLength];
-      UnsafeUtil.checkBounds(offsetBytes, strLength, mem.getCapacity());
+      mem.checkBounds(offsetBytes, strLength);
       mem.getByteArray(offsetBytes, bytes, 0, strLength);
       offsetBytes += strLength;
       array[i] = new String(bytes, StandardCharsets.UTF_8);

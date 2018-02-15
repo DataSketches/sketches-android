@@ -28,7 +28,7 @@ public class AccuracyTest {
     }
     Double[] randArr = seqArr.clone();
     shuffle(randArr);
-    ItemsSketch<Double> sketch = ItemsSketch.getInstance(k, Comparator.naturalOrder());
+    ItemsSketch<Double> sketch = ItemsSketch.newInstance(k, Comparator.naturalOrder());
     for (int i = 0; i < n; i++) {
       sketch.update(randArr[i]);
     }

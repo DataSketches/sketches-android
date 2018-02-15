@@ -6,7 +6,6 @@
 package com.yahoo.sketches;
 
 import com.yahoo.memory.Memory;
-import com.yahoo.memory.UnsafeUtil;
 import com.yahoo.memory.WritableMemory;
 
 /**
@@ -30,7 +29,7 @@ public class ArrayOfLongsSerDe extends ArrayOfItemsSerDe<Long> {
 
   @Override
   public Long[] deserializeFromMemory(final Memory mem, final int length) {
-    UnsafeUtil.checkBounds(0, (long)length * Long.BYTES, mem.getCapacity());
+    mem.checkBounds(0, (long)length * Long.BYTES);
     final Long[] array = new Long[length];
     long offsetBytes = 0;
     for (int i = 0; i < length; i++) {
