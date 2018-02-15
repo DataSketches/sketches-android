@@ -85,14 +85,14 @@ public class UtilTest {
   // a couple of basic unit tests for the histogram construction helper functions.
   @Test
   public void testQuadraticTimeIncrementHistogramCounters () {
-    final double[] samples = {0.1, 0.2, 0.3, 0.4, 0.5};
+    final Double[] samples = {0.1, 0.2, 0.3, 0.4, 0.5};
 
     {
-      final double [] splitPoints = {0.25, 0.4};
+      final Double[] splitPoints = {0.25, 0.4};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {200, 100, 200};
-      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 100, splitPoints, counters);
-        //.bilinearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 0, 5,100, splitPoints,
+              counters, Comparator.naturalOrder());
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
@@ -101,10 +101,11 @@ public class UtilTest {
     }
 
     {
-      final double [] splitPoints = {0.01, 0.02};
+      final Double[] splitPoints = {0.01, 0.02};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {0, 0, 500};
-      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints,
+              counters, Comparator.naturalOrder());
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
@@ -113,11 +114,11 @@ public class UtilTest {
     }
 
     {
-      final double [] splitPoints = {0.8, 0.9};
+      final Double[] splitPoints = {0.8, 0.9};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {500, 0, 0};
-      //DoublesPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
-      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.bilinearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints,
+              counters, Comparator.naturalOrder());
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
@@ -133,14 +134,14 @@ public class UtilTest {
 
   @Test
   public void testLinearTimeIncrementHistogramCounters () {
-    final double [] samples = {0.1, 0.2, 0.3, 0.4, 0.5};
-    final DoublesArrayAccessor accessor = DoublesArrayAccessor.wrap(samples);
+    final Double [] samples = {0.1, 0.2, 0.3, 0.4, 0.5};
     {
-      final double [] splitPoints = {0.25, 0.4};
+      final Double[] splitPoints = {0.25, 0.4};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {200, 100, 200};
-      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
-      DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints,
+              counters, Comparator.naturalOrder());
+      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
@@ -149,11 +150,12 @@ public class UtilTest {
     }
 
     {
-      final double [] splitPoints = {0.01, 0.02};
+      final Double[] splitPoints = {0.01, 0.02};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {0, 0, 500};
-      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
-      DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints,
+              counters, Comparator.naturalOrder());
+      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
@@ -162,11 +164,12 @@ public class UtilTest {
     }
 
     {
-      final double [] splitPoints = {0.8, 0.9};
+      final Double[] splitPoints = {0.8, 0.9};
       final long counters [] = {0, 0, 0};
       final long answers  [] = {500, 0, 0};
-      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints, counters);
-      DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
+      ItemsPmfCdfImpl.linearTimeIncrementHistogramCounters(samples, 0, 5, 100, splitPoints,
+              counters, Comparator.naturalOrder());
+      //DoublesPmfCdfImpl.linearTimeIncrementHistogramCounters(accessor, 100, splitPoints, counters);
       for (int j = 0; j < counters.length; j++) {
         assert counters[j] == answers[j];
         // System.out.printf ("counter[%d] = %d%n", j, counters[j]);
