@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Yahoo! Inc. Licensed under the terms of the
+ * Copyright 2018, Yahoo! Inc. Licensed under the terms of the
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
@@ -11,8 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Provides read-only primitive and primitive array methods to any of the four resources
- * mentioned in the package level documentation.
+ * Provides read-only primitive and primitive array methods to an underlying ByteBuffer.
  *
  * @author Jon Malkin
  * @author Roman Leventov
@@ -298,8 +297,7 @@ public abstract class Memory {
 
   /**
    * Returns true if the backing resource of <i>this</i> is identical with the backing resource
-   * of <i>that</i>. If the backing resource is a heap array or ByteBuffer, the offset and
-   * capacity must also be identical.
+   * of <i>that</i>, includin gthe offset and capacity.
    * @param that A different given Memory object
    * @return true if the backing resource of <i>this</i> is identical with the backing resource
    * of <i>that</i>.

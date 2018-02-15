@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, Yahoo! Inc. Licensed under the terms of the
+ * Copyright 2018, Yahoo! Inc. Licensed under the terms of the
  * Apache License 2.0. See LICENSE file at the project root for terms.
  */
 
@@ -11,8 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
- * Provides read and write primitive and primitive array access to any of the four resources
- * mentioned at the package level.
+ * Provides read and write primitive and primitive array access to an underlying ByteBuffer.
  *
  * @author Jon Malkin
  * @author Roman Leventov
@@ -83,6 +82,7 @@ public abstract class WritableMemory extends Memory {
   /**
    * Wraps the given primitive array for write operations, using the given byte order
    * @param arr the given primitive array
+   * @param byteOrder ByteOrder to use with the backing ByteBuffer
    * @return WritableMemory for write operations
    */
   public static WritableMemory wrap(final byte[] arr, final ByteOrder byteOrder) {
