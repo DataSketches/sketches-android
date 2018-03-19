@@ -337,7 +337,7 @@ class WritableMemoryImpl extends WritableMemory {
   }
 
   @Override
-  public boolean swapBytes() {
+  public boolean isSwapBytes() {
     return byteBuf.order() != ByteOrder.nativeOrder();
   }
 
@@ -396,12 +396,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putBooleanArray(final long offsetBytes, final boolean[] srcArray, final int srcOffset,
-                              final int length) {
-    final long copyBytes = length << BOOLEAN_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                              final int lengthBooleans) {
+    final long copyBytes = lengthBooleans << BOOLEAN_SHIFT;
+    Util.checkBounds(srcOffset, lengthBooleans, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, ++dstIdx) {
+    for (int i = srcOffset; i < srcOffset + lengthBooleans; ++i, ++dstIdx) {
       byteBuf.put(dstIdx, (byte) (srcArray[i] ? 0x1 : 0x0));
     }
   }
@@ -414,9 +414,9 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putByteArray(final long offsetBytes, final byte[] srcArray, final int srcOffset,
-                           final int length) {
-    final int copyBytes = length << BYTE_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                           final int lengthBytes) {
+    final int copyBytes = lengthBytes << BYTE_SHIFT;
+    Util.checkBounds(srcOffset, lengthBytes, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     if (byteBuf.hasArray()) {
       final byte[] dstArray = byteBuf.array();
@@ -424,7 +424,7 @@ class WritableMemoryImpl extends WritableMemory {
       System.arraycopy(srcArray, srcOffset, dstArray, dstOffset, copyBytes);
     } else {
       int dstIdx = offset + (int) offsetBytes;
-      for (int i = srcOffset; i < srcOffset + length; ++i, ++dstIdx) {
+      for (int i = srcOffset; i < srcOffset + lengthBytes; ++i, ++dstIdx) {
         byteBuf.put(dstIdx, srcArray[i]);
       }
     }
@@ -438,12 +438,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putCharArray(final long offsetBytes, final char[] srcArray, final int srcOffset,
-                           final int length) {
-    final long copyBytes = length << CHAR_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                           final int lengthChars) {
+    final long copyBytes = lengthChars << CHAR_SHIFT;
+    Util.checkBounds(srcOffset, lengthChars, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Character.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthChars; ++i, dstIdx += Character.BYTES) {
       byteBuf.putChar(dstIdx, srcArray[i]);
     }
   }
@@ -456,12 +456,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putDoubleArray(final long offsetBytes, final double[] srcArray, final int srcOffset,
-                             final int length) {
-    final long copyBytes = length << DOUBLE_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                             final int lengthDoubles) {
+    final long copyBytes = lengthDoubles << DOUBLE_SHIFT;
+    Util.checkBounds(srcOffset, lengthDoubles, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Double.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthDoubles; ++i, dstIdx += Double.BYTES) {
       byteBuf.putDouble(dstIdx, srcArray[i]);
     }
   }
@@ -474,12 +474,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putFloatArray(final long offsetBytes, final float[] srcArray, final int srcOffset,
-                            final int length) {
-    final long copyBytes = length << FLOAT_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                            final int lengthFloats) {
+    final long copyBytes = lengthFloats << FLOAT_SHIFT;
+    Util.checkBounds(srcOffset, lengthFloats, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Float.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthFloats; ++i, dstIdx += Float.BYTES) {
       byteBuf.putFloat(dstIdx, srcArray[i]);
     }
   }
@@ -492,12 +492,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putIntArray(final long offsetBytes, final int[] srcArray, final int srcOffset,
-                          final int length) {
-    final long copyBytes = length << INT_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                          final int lengthInts) {
+    final long copyBytes = lengthInts << INT_SHIFT;
+    Util.checkBounds(srcOffset, lengthInts, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Integer.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthInts; ++i, dstIdx += Integer.BYTES) {
       byteBuf.putInt(dstIdx, srcArray[i]);
     }
   }
@@ -510,12 +510,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putLongArray(final long offsetBytes, final long[] srcArray, final int srcOffset,
-                           final int length) {
-    final long copyBytes = length << LONG_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                           final int lengthLongs) {
+    final long copyBytes = lengthLongs << LONG_SHIFT;
+    Util.checkBounds(srcOffset, lengthLongs, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Long.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthLongs; ++i, dstIdx += Long.BYTES) {
       byteBuf.putLong(dstIdx, srcArray[i]);
     }
   }
@@ -528,12 +528,12 @@ class WritableMemoryImpl extends WritableMemory {
 
   @Override
   public void putShortArray(final long offsetBytes, final short[] srcArray, final int srcOffset,
-                            final int length) {
-    final long copyBytes = length << SHORT_SHIFT;
-    Util.checkBounds(srcOffset, length, srcArray.length);
+                            final int lengthShorts) {
+    final long copyBytes = lengthShorts << SHORT_SHIFT;
+    Util.checkBounds(srcOffset, lengthShorts, srcArray.length);
     Util.checkBounds(offsetBytes, copyBytes, capacity);
     int dstIdx = offset + (int) offsetBytes;
-    for (int i = srcOffset; i < srcOffset + length; ++i, dstIdx += Short.BYTES) {
+    for (int i = srcOffset; i < srcOffset + lengthShorts; ++i, dstIdx += Short.BYTES) {
       byteBuf.putShort(srcArray[i]);
     }
   }
@@ -595,11 +595,6 @@ class WritableMemoryImpl extends WritableMemory {
   //OTHER XXX
   @Override
   public MemoryRequestServer getMemoryRequestServer() { //only applicable to writable
-    return DefaultMemoryManager.getInstance();
-  }
-
-  @Override
-  public void setMemoryRequest(final MemoryRequestServer memReqSvr) {
-    //state.setMemoryRequestServer(memReqSvr);
+    return DefaultMemoryRequestServer.getInstance();
   }
 }

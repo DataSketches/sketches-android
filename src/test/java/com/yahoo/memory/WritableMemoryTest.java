@@ -21,10 +21,10 @@ public class WritableMemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(64); //big endian
     bb.order((ByteOrder.BIG_ENDIAN));
     WritableMemory wmem = WritableMemory.wrap(bb);
-    assertFalse(wmem.swapBytes()); // forced to LITTLE_ENDIAN in wrap()
+    assertFalse(wmem.isSwapBytes()); // forced to LITTLE_ENDIAN in wrap()
 
     bb.order((ByteOrder.BIG_ENDIAN));
-    assertTrue(wmem.swapBytes());
+    assertTrue(wmem.isSwapBytes());
     assertEquals(wmem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 }

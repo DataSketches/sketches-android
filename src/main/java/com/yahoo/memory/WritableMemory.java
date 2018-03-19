@@ -107,10 +107,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBooleans number of array units to transfer
    */
   public abstract void putBooleanArray(long offsetBytes, boolean[] srcArray, int srcOffset,
-          int length);
+                                       int lengthBooleans);
 
   /**
    * Puts the byte value at the given offset
@@ -124,10 +124,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthBytes number of array units to transfer
    */
   public abstract void putByteArray(long offsetBytes, byte[] srcArray, int srcOffset,
-          int length);
+                                    int lengthBytes);
 
   /**
    * Puts the char value at the given offset
@@ -141,10 +141,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthChars number of array units to transfer
    */
   public abstract void putCharArray(long offsetBytes, char[] srcArray, int srcOffset,
-          int length);
+                                    int lengthChars);
 
   /**
    * Puts the double value at the given offset
@@ -158,10 +158,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthDoubles number of array units to transfer
    */
   public abstract void putDoubleArray(long offsetBytes, double[] srcArray,
-          final int srcOffset, final int length);
+                                      final int srcOffset, final int lengthDoubles);
 
   /**
    * Puts the float value at the given offset
@@ -175,10 +175,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthFloats number of array units to transfer
    */
   public abstract void putFloatArray(long offsetBytes, float[] srcArray,
-          final int srcOffset, final int length);
+                                     final int srcOffset, final int lengthFloats);
 
   /**
    * Puts the int value at the given offset
@@ -192,10 +192,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthInts number of array units to transfer
    */
   public abstract void putIntArray(long offsetBytes, int[] srcArray,
-          final int srcOffset, final int length);
+                                   final int srcOffset, final int lengthInts);
 
   /**
    * Puts the long value at the given offset
@@ -209,10 +209,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthLongs number of array units to transfer
    */
   public abstract void putLongArray(long offsetBytes, long[] srcArray,
-          final int srcOffset, final int length);
+                                    final int srcOffset, final int lengthLongs);
 
   /**
    * Puts the short value at the given offset
@@ -226,10 +226,10 @@ public abstract class WritableMemory extends Memory {
    * @param offsetBytes offset bytes relative to this <i>WritableMemory</i> start
    * @param srcArray The source array.
    * @param srcOffset offset in array units
-   * @param length number of array units to transfer
+   * @param lengthShorts number of array units to transfer
    */
   public abstract void putShortArray(long offsetBytes, short[] srcArray,
-          final int srcOffset, final int length);
+                                     final int srcOffset, final int lengthShorts);
 
   //OTHER WRITE METHODS XXX
   /**
@@ -286,8 +286,8 @@ public abstract class WritableMemory extends Memory {
 
   //OTHER XXX
   /**
-   * Returns a MemoryRequest or null
-   * @return a MemoryRequest or null
+   * Returns a MemoryRequestServer or null
+   * @return a MemoryRequestServer or null
    */
   public abstract MemoryRequestServer getMemoryRequestServer();
 
@@ -299,10 +299,4 @@ public abstract class WritableMemory extends Memory {
    * @return the offset of the start of this WritableMemory from the backing resource.
    */
   public abstract long getRegionOffset(long offsetBytes);
-
-  /**
-   * Sets a MemoryRequest for this WritableMemory
-   * @param memReqSvr the given MemoryRequest
-   */
-  public abstract void setMemoryRequest(MemoryRequestServer memReqSvr);
 }

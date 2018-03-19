@@ -44,19 +44,23 @@ final class ItemsAuxiliary<T> {
     // taking advantage of the already sorted blocks of length k
     ItemsMergeImpl.blockyTandemMergeSort((T[]) itemsArr, cumWtsArr, numSamples, k, qs.getComparator());
 
-    // convert the item weights into totals of the weights preceding each item
-    long subtot = 0;
-    for (int i = 0; i < numSamples + 1; i++ ) {
-      final long newSubtot = subtot + cumWtsArr[i];
-      cumWtsArr[i] = subtot;
-      subtot = newSubtot;
-    }
-
+    final long subtot = convertToPrecedingCummulative(cumWtsArr);
     assert subtot == n;
 
     auxN_ = n;
     auxSamplesArr_ = itemsArr;
     auxCumWtsArr_ = cumWtsArr;
+  }
+
+  // convert the item weights into totals of the weights preceding each item
+  static long convertToPrecedingCummulative(final long[] array) {
+    long subtotal = 0;
+    for (int i = 0; i < array.length; i++) {
+      final long newSubtotal = subtotal + array[i];
+      array[i] = subtotal;
+      subtotal = newSubtotal;
+    }
+    return subtotal;
   }
 
   /**

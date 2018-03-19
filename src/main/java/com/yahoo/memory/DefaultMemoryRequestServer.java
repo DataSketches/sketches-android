@@ -9,20 +9,18 @@ package com.yahoo.memory;
  * Implements a very simple memory management function that allocates new requests onto the heap.
  * @author Lee Rhodes
  */
-final class DefaultMemoryManager implements MemoryRequestServer {
-  private static final DefaultMemoryManager memMgr = new DefaultMemoryManager();
+final class DefaultMemoryRequestServer implements MemoryRequestServer {
+  private static final DefaultMemoryRequestServer memMgr = new DefaultMemoryRequestServer();
 
-  private DefaultMemoryManager() {}
+  private DefaultMemoryRequestServer() {}
 
-  static DefaultMemoryManager getInstance() {
+  static DefaultMemoryRequestServer getInstance() {
     return memMgr;
   }
 
   @Override
-  public WritableMemory request(final long capacityBytes) { //default allocate on heap
-    final WritableMemory mem = WritableMemory.allocate((int) capacityBytes);
-    mem.setMemoryRequest(this);
-    return mem;
+  public WritableMemory request(final long capacityBytes) { // default allocate on heap
+    return WritableMemory.allocate((int) capacityBytes);
   }
 
   @Override

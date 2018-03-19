@@ -9,7 +9,6 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
@@ -134,10 +133,10 @@ public class MemoryTest {
     ByteBuffer bb = ByteBuffer.allocate(n * 8);
     bb.order(ByteOrder.BIG_ENDIAN);
     Memory mem = Memory.wrap(bb);
-    assertFalse(mem.swapBytes()); // forced to little endian in wrap()
+    assertFalse(mem.isSwapBytes()); // forced to little endian in wrap()
 
     bb.order(ByteOrder.BIG_ENDIAN);
-    assertTrue(mem.swapBytes());
+    assertTrue(mem.isSwapBytes());
     assertEquals(mem.getResourceOrder(), ByteOrder.BIG_ENDIAN);
   }
 
