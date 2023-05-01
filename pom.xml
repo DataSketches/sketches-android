@@ -59,7 +59,7 @@
         
         <!-- Dependencies -->
         <memory.version>0.10.3</memory.version>
-        <testng.version>6.13.1</testng.version>
+        <testng.version>7.7.0</testng.version>
         
         <!-- Maven Plugins -->
         <maven-assembly-plugin.version>3.1.0</maven-assembly-plugin.version>
